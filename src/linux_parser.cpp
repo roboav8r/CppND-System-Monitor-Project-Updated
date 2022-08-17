@@ -102,21 +102,45 @@ long LinuxParser::UpTime() {
   return stol(up_time_sec);
 }
 
-// TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+// Read and return the number of jiffies for the system
+unsigned long int LinuxParser::Jiffies(vector<string> current_util) {
+  return ActiveJiffies(current_util) + IdleJiffies(current_util);
+}
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
 
-// TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+// Read and return the number of active jiffies for the system
+unsigned long int LinuxParser::ActiveJiffies(vector<string> current_util) {
+  // Active is sum of user + nice + system + irq + softirq + steal
+  return stoi(current_util[0]) + stoi(current_util[1]) + stoi(current_util[2]) 
+  + stoi(current_util[5]) + stoi(current_util[6]) + stoi(current_util[7]);
+}
 
-// TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+// Read and return the number of idle jiffies for the system
+unsigned long int LinuxParser::IdleJiffies(vector<string> current_util) {
+  // Idle is sum of idle and iowait
+  return stoi(current_util[3]) + stoi(current_util[4]);
+}
 
-// TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+// Read and return CPU utilization
+vector<string> LinuxParser::CpuUtilization() {
+  string line;
+  string cpu, user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice; 
+
+  std::ifstream filestream(kProcDirectory + kStatFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      while (linestream >> cpu >> user >> nice >> system >> idle >> iowait >> irq >> softirq >> steal >> guest >> guest_nice ) {
+        if (cpu == "cpu") {  
+          return vector<string> {user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice};
+        }
+      }
+    }
+  }
+}
 
 // Read and return the total number of processes
 int LinuxParser::TotalProcesses() {
