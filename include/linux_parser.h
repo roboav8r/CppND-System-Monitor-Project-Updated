@@ -5,6 +5,8 @@
 #include <regex>
 #include <string>
 
+#include <unistd.h>
+
 namespace LinuxParser {
 // Paths
 const std::string kProcDirectory{"/proc/"};
