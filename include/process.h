@@ -17,11 +17,14 @@ class Process {
   std::string Ram();
   long int UpTime();
   bool operator<(Process const& a) const;  // TODO: See src/process.cpp
+  std::vector<std::string> Stat(); // Helper function to get stat info
 
   Process(int); // Constructor with PID as input
 
  private:
   int pid_;
+  std::vector<std::string> last_stat_;
+  float util_;
 };
 
 #endif
