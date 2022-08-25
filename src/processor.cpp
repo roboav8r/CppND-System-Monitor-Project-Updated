@@ -14,16 +14,14 @@ float Processor::Utilization() {
     long int prev_idle = LinuxParser::IdleJiffies(this->last_util_);
     long int prev_total = LinuxParser::Jiffies(this->last_util_);
 
-    std::vector<std::string> current_util = LinuxParser::CpuUtilization();
-    this->last_util_ = current_util; // store current utilization for next iteration
+    // Compute & store current CPU usage
+    this->last_util_ = LinuxParser::CpuUtilization();
+    long int idle = LinuxParser::IdleJiffies(this->last_util_);
+    long int total = LinuxParser::Jiffies(this->last_util_);
 
-    long int idle = LinuxParser::IdleJiffies(current_util);
-    long int total = LinuxParser::Jiffies(current_util);
-
+    // Compute and return differential CPU usage
     long int delta_total = total - prev_total;
     long int delta_idle = idle - prev_idle;
-
     float cpu_pct = ((float)delta_total - (float)delta_idle)/(float)delta_total;
-
     return cpu_pct;
 }

@@ -24,6 +24,7 @@ class Process {
  private:
   int pid_;
   std::vector<std::string> last_stat_;
+  long int last_uptime_;
   float util_;
 };
 
