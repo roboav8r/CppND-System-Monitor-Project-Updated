@@ -21,7 +21,7 @@ Process::Process(int pid){
 int Process::Pid() { return pid_; }
 
 // TODO: Return this process's CPU utilization
-float Process::CpuUtilization() { 
+inline float Process::CpuUtilization() { 
 
     vector<string> current_stat = Stat();
     long int utime = stoi(current_stat[13]);
