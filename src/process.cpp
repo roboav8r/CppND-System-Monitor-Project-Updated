@@ -19,7 +19,28 @@ Process::Process(int pid){
 int Process::Pid() { return pid_; }
 
 // TODO: Return this process's CPU utilization
-float Process::CpuUtilization() { return 0; }
+float Process::CpuUtilization() { 
+
+  // string up_time_sec, idle_time_sec;
+  string line;
+  float cpu_util;
+  
+  std::ifstream stream(LinuxParser::kProcDirectory + std::to_string(this->pid_) + LinuxParser::kStatFilename);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+
+    // Convert line to string vector per https://knowledge.udacity.com/questions/49126
+    std::istream_iterator<string> beg(linestream), end; 
+    vector<string> values(beg, end);
+
+    cpu_util = ((stoi(values[13]) + stoi(values[14]) + stoi(values[15]) + stoi(values[16])) / sysconf(_SC_CLK_TCK));
+  }
+
+  //this->util_ = cpu_util/this->UpTime();
+
+  return this->pid_/1000 ;
+}
 
 // Return the command that generated this process
 string Process::Command() { 
@@ -36,11 +57,13 @@ string Process::User() {
     return LinuxParser::User(pid_);
 }
 
-// TODO: Return the age of this process (in seconds)
+// Return the age of this process (in seconds)
 long int Process::UpTime() {
     return LinuxParser::UpTime(pid_);
 }
 
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function
-bool Process::operator<(Process const& a[[maybe_unused]]) const { return true; }
+bool Process::operator<(Process const& a) const { 
+    return this->pid_ > a.pid_;
+}
