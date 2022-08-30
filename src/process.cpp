@@ -77,6 +77,9 @@ std::vector<std::string> Process::Stat()
     vector<string> values(beg, end);
 
     return values;
+  
+  } else {
+    return vector<string>{};
   }
 
 }
